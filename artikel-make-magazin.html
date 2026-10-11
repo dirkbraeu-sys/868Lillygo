@@ -329,7 +329,19 @@
     <p><a href="https://ntfy.sh">ntfy.sh</a> ist ein simpler, quelloffener Push-Dienst: Ein einziger HTTP-POST an eine selbst gewählte Themen-URL genügt – kein eigener Server, kein Konto. Auf dem Handy die kostenlose ntfy-App installieren und dasselbe Thema abonnieren. Weil das Board aus Speichergründen ohne TLS sendet, wird ein zufälliges, nicht erratbares Thema verwendet; ntfy-Themen sind sonst öffentlich lesbar.</p>
   </div>
 
-  <h2><span class="num">07</span>Messen, was wirklich ankommt</h2>
+  <h2><span class="num">07</span>Noch mehr Sensoren: Wind, Sonne, Regen</h2>
+
+  <p>Mit Temperatur, Feuchte und Wasser ist die Liste längst nicht zu Ende: Im 868-MHz-Band sendet eine Vielzahl weiterer Sensoren – <strong>Windmesser, Regenmesser, Sonnenschein- und UV-Sensoren</strong>, komplette Wetterstationen und mehr. Die Dekoder der Bibliothek <code>rtl_433_ESP</code> erkennen viele davon bereits, der Empfänger hört sie also ohnehin mit.</p>
+
+  <p>Die Messwerte lassen sich nicht nur empfangen, sondern auch <strong>auswerten und verwerten</strong>: Jedes Telegramm, das der Empfänger nicht selbst als Temperatur- oder Wassersensor verarbeitet, taucht in der Diagnoseseite <code>/andere</code> samt allen Feldern auf – Windgeschwindigkeit, Regenmenge, Helligkeit, was der Sensor eben sendet. Von dort ist es nur ein kleiner Schritt: Genau wie beim Wassermelder beschreibt man Claude Code in einem Satz, was daraus werden soll – eine Kachel auf der Startseite, ein Grenzwert für Sturm, eine Meldung bei Regen über der Wäscheleine, das Schließen der Markise bei zu viel Sonne –, und die Funktion ist nach wenigen Runden im Board.</p>
+
+  <ul class="feat">
+    <li><strong>Wind</strong> – Böen- und Durchschnittswerte, zum Beispiel als Sturmwarnung für Markise oder Sonnenschirm.</li>
+    <li><strong>Regen</strong> – Regenmenge und -rate, etwa als Hinweis, dass die Wäsche reingeholt werden sollte.</li>
+    <li><strong>Sonne und UV</strong> – Einstrahlung als Grundlage für Beschattung oder Lüftungsentscheidungen.</li>
+  </ul>
+
+  <h2><span class="num">08</span>Messen, was wirklich ankommt</h2>
 
   <p>Wer sich auf Funk verlässt, will wissen, wie zuverlässig er ist. Der Empfänger liefert deshalb zu jedem Telegramm die Feldstärke (RSSI) mit, und ein kleines PowerShell-Skript schreibt jedes Sendetelegramm samt Zeitstempel in eine CSV-Datei. Eine Stunde Mitschrift ergab:</p>
 
@@ -350,11 +362,11 @@
     <figcaption>/DISPLAY · WELCHE SEITEN DAS OLED IN WELCHER REIHENFOLGE ZEIGT</figcaption>
   </figure>
 
-  <h2><span class="num">08</span>Ohne WLAN, aber mit Verlauf – oder umgekehrt</h2>
+  <h2><span class="num">09</span>Ohne WLAN, aber mit Verlauf – oder umgekehrt</h2>
 
   <p>Wer auf Push-Nachrichten verzichtet oder gar kein WLAN bereitstellen will, verliert nichts Grundlegendes: Grenzwerte und Referenzvergleich laufen lokal auf dem ESP32, die Werte erscheinen auf dem OLED, die Lüftungsempfehlung zeigt die Onboard-LED. Wer dagegen den <strong>Verlauf über Wochen</strong> sehen möchte, kann den Empfänger per Compiler-Schalter an <a href="https://thingspeak.com">ThingSpeak</a> anbinden: Die Werte landen alle 60&nbsp;Sekunden in der Cloud, samt Diagrammen und Export – etwas, das der Ringpuffer im Arbeitsspeicher des Boards bei jedem Neustart verliert.</p>
 
-  <h2><span class="num">09</span>Selber bauen – auch ohne Vorkenntnisse</h2>
+  <h2><span class="num">10</span>Selber bauen – auch ohne Vorkenntnisse</h2>
 
   <blockquote>Programmieren war noch nie so einfach: Board anstecken, Wunsch in einem Satz formulieren – und Claude Code schreibt, kompiliert und flasht auf Zuruf, was gebraucht wird.</blockquote>
 
@@ -403,7 +415,7 @@
     <div class="parts-total"><span>Pro zusätzlichem Messpunkt</span><span>+15 bis 20&nbsp;€</span></div>
   </div>
 
-  <h2><span class="num">10</span>Fazit</h2>
+  <h2><span class="num">11</span>Fazit</h2>
 
   <p>Aus einer einfachen Beobachtung – „warum wird’s im Keller feuchter?” – ist ein vielseitiges Überwachungssystem geworden: automatische Lüftungsempfehlung, Kälteausfall-Alarm für Kühlschrank und Gefriertruhe, Wasserleck-Alarm für Waschmaschine und Keller, dazu ein Funk-Logger für die eigene Neugier. Alles auf einem einzigen 30-Euro-Board, alles auf einer Frequenz. Der Aufwand steckte nicht im Löten, sondern im Zusammenspiel aus Funkempfang, Schwellenwerten und Benachrichtigung – und dafür war ein KI-gestützter Entwicklungsprozess ausgesprochen praktisch.</p>
 
