@@ -102,6 +102,11 @@
   table.tbl th, table.tbl td { text-align: left; padding: .5em .6em; border-bottom: 1px solid var(--line); vertical-align: top; }
   table.tbl th { font-family: "IBM Plex Mono", monospace; font-size: .74rem; color: var(--muted);
     text-transform: uppercase; letter-spacing: .06em; }
+  figure.shot { margin: 1.8em 0; padding: 0; }
+  figure.shot img { display: block; width: 100%; height: auto; border-radius: 12px;
+    border: 1px solid var(--line); box-shadow: 0 8px 24px var(--shadow); }
+  figure.shot figcaption { font-family: "IBM Plex Mono", monospace; font-size: .74rem; color: var(--muted);
+    text-align: center; margin-top: .7em; letter-spacing: .01em; }
   footer.article-end { margin-top: 3em; padding-top: 1.4em; border-top: 1px solid var(--line);
     font-size: .88rem; color: var(--muted); line-height: 1.6; }
   @media (max-width: 480px) { .parts li { flex-direction: column; gap: .2em; } }
@@ -193,6 +198,11 @@
     <p>Wer noch keinen eigenen Sensor hat, muss nicht warten: Weil der Empfänger ungefiltert jedes Telegramm mitschreibt, taucht oft schon nach Minuten die Wetterstation eines Nachbarn auf. Die kann man für erste Tests der Oberfläche oder des Referenzvergleichs einfach mitnutzen.</p>
   </div>
 
+  <figure class="shot">
+    <img src="bilder/screenshot-uebersicht.png" alt="Startseite mit zwei Sensorkacheln, Abweichung zur Referenz und OLED-Vorschau">
+    <figcaption>STARTSEITE · INNENSENSOR MIT ABWEICHUNG ZUR REFERENZ „AUSSEN“ UND LIVE-VORSCHAU DES OLED</figcaption>
+  </figure>
+
   <h2><span class="num">03</span>FSK statt OOK: Warum anfangs nichts ankam</h2>
 
   <p>Der erste Start war ernüchternd: Das Board lief, die Weboberfläche war da – und „0 von 0 Sensoren gesehen”. Die Ursache steckt in der Funktechnik: Viele 433-MHz-Wettersensoren nutzen <strong>OOK</strong> (Ein-Aus-Tastung), die Ecowitt-Sensoren auf 868&nbsp;MHz dagegen <strong>FSK</strong> (Frequenzumtastung). Die Bibliothek kann pro Firmware aber nur <em>eine</em> der beiden Modulationen empfangen; sie wird beim Kompilieren festgelegt. Ein OOK-Build sieht die 868-MHz-Sensoren nie.</p>
@@ -233,6 +243,11 @@
     <li><strong>Testknopf</strong> – ein Klick sendet eine Testnachricht und prüft damit die ganze Kette bis zum Handy.</li>
   </ul>
 
+  <figure class="shot">
+    <img src="bilder/screenshot-wasser.png" alt="Seite Wassersensoren mit einem trockenen WH55">
+    <figcaption>/WASSER · WH55 „KÜCHE“: STATUS, BATTERIE, SIGNALSTÄRKE UND ROHWERT</figcaption>
+  </figure>
+
   <div class="alarm-demo">💧 WASSER ERKANNT: Waschmaschine</div>
 
   <p>Im Test genügte es, Batterie kurz herauszunehmen und die Kontakte zu befeuchten: Binnen weniger Sekunden stand die Nachricht auf dem Handy, neun Sekunden nach dem Abtrocknen folgte die Entwarnung.</p>
@@ -272,6 +287,11 @@
   </table>
 
   <p>Für Alarmzwecke ist das unkritisch: Selbst bei einem verlorenen Telegramm sendet der Sensor 61&nbsp;Sekunden später wieder.</p>
+
+  <figure class="shot">
+    <img src="bilder/screenshot-display.png" alt="Seite Display-Anzeige mit Sensorkarten, Tacho und OLED-Vorschau">
+    <figcaption>/DISPLAY · WELCHE SEITEN DAS OLED IN WELCHER REIHENFOLGE ZEIGT</figcaption>
+  </figure>
 
   <h2><span class="num">09</span>Ohne WLAN, aber mit Verlauf – oder umgekehrt</h2>
 
