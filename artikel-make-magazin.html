@@ -275,15 +275,23 @@
     <p>Der Empfänger wertet den Wasseralarm lokal aus: OLED und LED schlagen auch dann an, wenn Router oder Internet ausgefallen sind – nur die Handy-Nachricht braucht die Verbindung.</p>
   </div>
 
-  <h2><span class="num">07</span>Zweites Leben: Wächter für Kühlschrank oder Gefriertruhe</h2>
+  <h2><span class="num">07</span>Weitere Anwendung: Kühlschrank und Gefriertruhe überwachen</h2>
 
-  <p>Parallel entstand ein unabhängiges Projekt: eine Lösung für Betriebe wie Bäckereien, die nach einem Stromausfall sofort eine Nachricht bekommen sollen, wenn Kühlschrank oder Gefriertruhe zu warm werden. Technisch braucht es dieselbe Basis wie der Lüftungsberater: Funkempfang, Grenzwertüberwachung, verlässliche Alarmierung.</p>
+  <p>Wie beim Wassermelder zeigt sich auch hier die Stärke des Aufbaus: Das Board empfängt ohnehin Temperaturwerte per Funk, also lässt es sich ebenso als <strong>Temperaturwächter</strong> einsetzen – ganz ohne Feuchtemessung. Wer den Lüftungsberater nicht braucht, baut dasselbe Gerät als reinen Kälte-Alarm: ein Funksensor in den Kühlschrank oder die Gefriertruhe, ein Grenzwert in der Weboberfläche, fertig.</p>
+
+  <p>Das ist längst nicht nur etwas für Bäckereien, Metzgereien oder Gastronomie, die nach einem Stromausfall sofort Bescheid wissen müssen. Auch im <strong>eigenen Haushalt</strong> ist es Gold wert: Wer kennt nicht die Angst vor der halb offen stehenden Gefriertruhe im Keller oder dem Stromausfall im Urlaub, nach dem ein ganzer Wintervorrat aufgetaut ist? Hier meldet sich das Handy, bevor etwas verdirbt.</p>
 
   <ul class="feat">
-    <li><strong>Signalverlust</strong> – meldet sich ein Sensor 15 Minuten nicht mehr, kommt eine Warnung (und eine Entwarnung, sobald der Empfang zurück ist).</li>
+    <li><strong>Temperaturgrenzen</strong> – zum Beispiel Kühlschrank „Meldung über 7&nbsp;°C“ und Gefriertruhe „Meldung über −15&nbsp;°C“, jeweils mit Hysterese, damit kurzes Türöffnen keinen Alarm auslöst.</li>
+    <li><strong>Signalverlust</strong> – meldet sich ein Sensor 15 Minuten nicht mehr, kommt eine Warnung (und eine Entwarnung, sobald der Empfang zurück ist). Das deckt auch den Fall ab, dass Sensor oder Strom komplett ausfallen.</li>
     <li><strong>Batteriezustand</strong> – steckt im Funktelegramm und wird automatisch mitüberwacht.</li>
     <li><strong>Einzeln abschaltbare Meldungen</strong> – jeder Grenzwert lässt sich separat stummschalten, ohne dass die farbliche Warnung auf der Startseite verloren geht.</li>
   </ul>
+
+  <div class="box">
+    <h3><span class="dot"></span>Tipps für den Einsatz in der Kälte</h3>
+    <p>Der Sensor gehört ins Innere des Geräts. Metall und Dichtungen dämpfen das Funksignal – die Anzeige der Feldstärke (RSSI) in der Weboberfläche zeigt, ob der Empfang reicht, und sonst hilft ein anderer Platz für das Board. Bei Dauerkälte lassen die Batterien schneller nach; für Gefriergeräte sind Lithium-Batterien die bessere Wahl. Schwächeln sie trotzdem, meldet sie der Batteriewächter rechtzeitig.</p>
+  </div>
 
   <div class="box amber">
     <h3><span class="dot"></span>Warum ntfy?</h3>
