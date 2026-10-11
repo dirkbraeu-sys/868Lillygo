@@ -250,22 +250,16 @@
     <figcaption>STARTSEITE · INNENSENSOR MIT ABWEICHUNG ZUR REFERENZ „AUSSEN“ UND LIVE-VORSCHAU DES OLED</figcaption>
   </figure>
 
-  <h2><span class="num">03</span>FSK statt OOK: Warum anfangs nichts ankam</h2>
-
-  <p>Der erste Start war ernüchternd: Das Board lief, die Weboberfläche war da – und „0 von 0 Sensoren gesehen”. Die Ursache steckt in der Funktechnik: Viele 433-MHz-Wettersensoren nutzen <strong>OOK</strong> (Ein-Aus-Tastung), die Ecowitt-Sensoren auf 868&nbsp;MHz dagegen <strong>FSK</strong> (Frequenzumtastung). Die Bibliothek kann pro Firmware aber nur <em>eine</em> der beiden Modulationen empfangen; sie wird beim Kompilieren festgelegt. Ein OOK-Build sieht die 868-MHz-Sensoren nie.</p>
-
-  <p>Mit <code>-DOOK_MODULATION=false</code>, 868,35&nbsp;MHz und einer angepassten Mindest-Signallänge lief es sofort: Der Sensor meldete sich alle 61 Sekunden, Kanal 1 und 2 mit leicht unterschiedlichem Takt (61 bzw. 62&nbsp;s), damit sich mehrere Sensoren nicht dauerhaft überlagern.</p>
-
   <div class="box amber">
-    <h3><span class="dot"></span>Nicht jedes Funkboard taugt</h3>
-    <p>Ein Heltec-WiFi-LoRa-32-V3 mit SX1262 scheiterte: Der Chip liefert keinen rohen Bitstrom, den die rtl_433-Dekoder brauchen. Geeignet sind SX127x-Boards wie das LoRa32 V2.1 oder ein CC1101-Modul.</p>
+    <h3><span class="dot"></span>Hinweis zu Funk und Board</h3>
+    <p>Die Ecowitt-Sensoren senden auf 868,35&nbsp;MHz mit FSK-Modulation; die Bibliothek wird deshalb im FSK-Modus gebaut (pro Firmware ist nur FSK <em>oder</em> OOK möglich). Das Board muss einen SX127x- oder CC1101-Funkchip haben, etwa das LoRa32 V2.1. Boards mit SX1262, zum Beispiel der Heltec WiFi LoRa 32 V3, liefern keinen rohen Bitstrom und sind für diesen Zweck nicht geeignet.</p>
   </div>
 
-  <h2><span class="num">04</span>Warum absolute statt relativer Feuchte?</h2>
+  <h2><span class="num">03</span>Warum absolute statt relativer Feuchte?</h2>
 
   <p>Relative Luftfeuchte allein täuscht: Kalte Luft <em>wirkt</em> feuchter als warme, selbst wenn sie weniger Wasser trägt. Der Empfänger rechnet deshalb aus Temperatur und relativer Feuchte über die Magnus-Formel die <strong>absolute Feuchte</strong> in Gramm Wasserdampf pro Kubikmeter aus – und zeigt sie groß neben den anderen Werten an.</p>
 
-  <h2><span class="num">05</span>Referenzvergleich und Lüftungsempfehlung</h2>
+  <h2><span class="num">04</span>Referenzvergleich und Lüftungsempfehlung</h2>
 
   <p>In den Einstellungen wird ein Sensor als <strong>Referenz</strong> markiert – bei mir der Außenfühler. Für jeden anderen Sensor lässt sich ein Vergleich zuschalten: Übersteigt die Differenz der absoluten Feuchte einen Grenzwert, steht drinnen spürbar mehr Wasserdampf als draußen.</p>
 
@@ -280,7 +274,7 @@
 
   <hr class="orn">
 
-  <h2><span class="num">06</span>Neu: Wasserleck-Melder für Waschmaschine und Keller</h2>
+  <h2><span class="num">05</span>Neu: Wasserleck-Melder für Waschmaschine und Keller</h2>
 
   <p>Die jüngste Erweiterung: Der <strong>Ecowitt WH55</strong>, ein batteriebetriebener Wassermelder mit Kontaktfühler, sendet ebenfalls auf 868,35&nbsp;MHz. Zunächst erschien er nicht im Board: Die Firmware verwarf alles ohne Temperatur- und Feuchtewert. Eine kleine Diagnoseseite <code>/andere</code> zeigte dann die verworfenen Telegramme – darunter das des WH55 mit Kennung, Kanal, <code>battery_ok</code>, <code>alarm</code> und einem Rohwert, der trocken bei etwa 730 liegt und nass auf rund 250 fällt.</p>
 
@@ -317,7 +311,7 @@
     <p>Der Empfänger wertet den Wasseralarm lokal aus: OLED und LED schlagen auch dann an, wenn Router oder Internet ausgefallen sind – nur die Handy-Nachricht braucht die Verbindung.</p>
   </div>
 
-  <h2><span class="num">07</span>Weitere Anwendung: Kühlschrank und Gefriertruhe überwachen</h2>
+  <h2><span class="num">06</span>Weitere Anwendung: Kühlschrank und Gefriertruhe überwachen</h2>
 
   <p>Wie beim Wassermelder zeigt sich auch hier die Stärke des Aufbaus: Das Board empfängt ohnehin Temperaturwerte per Funk, also lässt es sich ebenso als <strong>Temperaturwächter</strong> einsetzen – ganz ohne Feuchtemessung. Wer den Lüftungsberater nicht braucht, baut dasselbe Gerät als reinen Kälte-Alarm: ein Funksensor in den Kühlschrank oder die Gefriertruhe, ein Grenzwert in der Weboberfläche, fertig.</p>
 
@@ -335,7 +329,7 @@
     <p><a href="https://ntfy.sh">ntfy.sh</a> ist ein simpler, quelloffener Push-Dienst: Ein einziger HTTP-POST an eine selbst gewählte Themen-URL genügt – kein eigener Server, kein Konto. Auf dem Handy die kostenlose ntfy-App installieren und dasselbe Thema abonnieren. Weil das Board aus Speichergründen ohne TLS sendet, wird ein zufälliges, nicht erratbares Thema verwendet; ntfy-Themen sind sonst öffentlich lesbar.</p>
   </div>
 
-  <h2><span class="num">08</span>Messen, was wirklich ankommt</h2>
+  <h2><span class="num">07</span>Messen, was wirklich ankommt</h2>
 
   <p>Wer sich auf Funk verlässt, will wissen, wie zuverlässig er ist. Der Empfänger liefert deshalb zu jedem Telegramm die Feldstärke (RSSI) mit, und ein kleines PowerShell-Skript schreibt jedes Sendetelegramm samt Zeitstempel in eine CSV-Datei. Eine Stunde Mitschrift ergab:</p>
 
@@ -356,11 +350,11 @@
     <figcaption>/DISPLAY · WELCHE SEITEN DAS OLED IN WELCHER REIHENFOLGE ZEIGT</figcaption>
   </figure>
 
-  <h2><span class="num">09</span>Ohne WLAN, aber mit Verlauf – oder umgekehrt</h2>
+  <h2><span class="num">08</span>Ohne WLAN, aber mit Verlauf – oder umgekehrt</h2>
 
   <p>Wer auf Push-Nachrichten verzichtet oder gar kein WLAN bereitstellen will, verliert nichts Grundlegendes: Grenzwerte und Referenzvergleich laufen lokal auf dem ESP32, die Werte erscheinen auf dem OLED, die Lüftungsempfehlung zeigt die Onboard-LED. Wer dagegen den <strong>Verlauf über Wochen</strong> sehen möchte, kann den Empfänger per Compiler-Schalter an <a href="https://thingspeak.com">ThingSpeak</a> anbinden: Die Werte landen alle 60&nbsp;Sekunden in der Cloud, samt Diagrammen und Export – etwas, das der Ringpuffer im Arbeitsspeicher des Boards bei jedem Neustart verliert.</p>
 
-  <h2><span class="num">10</span>Selber bauen – auch ohne Vorkenntnisse</h2>
+  <h2><span class="num">09</span>Selber bauen – auch ohne Vorkenntnisse</h2>
 
   <blockquote>Programmieren war noch nie so einfach: Board anstecken, Wunsch in einem Satz formulieren – und Claude Code schreibt, kompiliert und flasht auf Zuruf, was gebraucht wird.</blockquote>
 
@@ -400,7 +394,7 @@
     <div class="parts-total"><span>Pro zusätzlichem Messpunkt</span><span>+15 bis 20&nbsp;€</span></div>
   </div>
 
-  <h2><span class="num">11</span>Fazit</h2>
+  <h2><span class="num">10</span>Fazit</h2>
 
   <p>Aus einer einfachen Beobachtung – „warum wird’s im Keller feuchter?” – ist ein vielseitiges Überwachungssystem geworden: automatische Lüftungsempfehlung, Kälteausfall-Alarm für Kühlschrank und Gefriertruhe, Wasserleck-Alarm für Waschmaschine und Keller, dazu ein Funk-Logger für die eigene Neugier. Alles auf einem einzigen 30-Euro-Board, alles auf einer Frequenz. Der Aufwand steckte nicht im Löten, sondern im Zusammenspiel aus Funkempfang, Schwellenwerten und Benachrichtigung – und dafür war ein KI-gestützter Entwicklungsprozess ausgesprochen praktisch.</p>
 
