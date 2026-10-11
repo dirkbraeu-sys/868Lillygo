@@ -331,7 +331,7 @@
 
   <h2><span class="num">07</span>Noch mehr Sensoren: Wind, Sonne, Regen</h2>
 
-  <p>Mit Temperatur, Feuchte und Wasser ist die Liste längst nicht zu Ende: Im 868-MHz-Band sendet eine Vielzahl weiterer Sensoren – <strong>Windmesser, Regenmesser, Sonnenschein- und UV-Sensoren</strong>, komplette Wetterstationen und mehr. Die Dekoder der Bibliothek <code>rtl_433_ESP</code> erkennen viele davon bereits, der Empfänger hört sie also ohnehin mit.</p>
+  <p>Mit Temperatur, Feuchte und Wasser ist die Liste längst nicht zu Ende: Im 868-MHz-Band senden weitere Ecowitt-/Fine-Offset-Sensoren – <strong>Wind, Regen, Sonne und UV</strong>, Luftqualität, Blitze und komplette Wetterstationen. Die Bibliothek <code>rtl_433_ESP</code> bringt dafür passende FSK-Dekoder mit, unter anderem für die Wetterstationen <strong>WS90</strong> (Wind, Regen, Licht/UV, Temperatur), <strong>WS85</strong> (Wind und Regen) und <strong>WS80</strong> (Wind und Sonne), die Luftqualitätssensoren <strong>WH45</strong> und <strong>WH43</strong> sowie den Blitzsensor <strong>WH57</strong>. Der Empfänger hört sie auf derselben Frequenz mit.</p>
 
   <p>Die Messwerte lassen sich nicht nur empfangen, sondern auch <strong>auswerten und verwerten</strong>: Jedes Telegramm, das der Empfänger nicht selbst als Temperatur- oder Wassersensor verarbeitet, taucht in der Diagnoseseite <code>/andere</code> samt allen Feldern auf – Windgeschwindigkeit, Regenmenge, Helligkeit, was der Sensor eben sendet. Von dort ist es nur ein kleiner Schritt: Genau wie beim Wassermelder beschreibt man Claude Code in einem Satz, was daraus werden soll – eine Kachel auf der Startseite, ein Grenzwert für Sturm, eine Meldung bei Regen über der Wäscheleine, das Schließen der Markise bei zu viel Sonne –, und die Funktion ist nach wenigen Runden im Board.</p>
 
@@ -339,6 +339,7 @@
     <li><strong>Wind</strong> – Böen- und Durchschnittswerte, zum Beispiel als Sturmwarnung für Markise oder Sonnenschirm.</li>
     <li><strong>Regen</strong> – Regenmenge und -rate, etwa als Hinweis, dass die Wäsche reingeholt werden sollte.</li>
     <li><strong>Sonne und UV</strong> – Einstrahlung als Grundlage für Beschattung oder Lüftungsentscheidungen.</li>
+    <li><strong>Luftqualität und Blitze</strong> – Feinstaub- und Gewitterwarnungen aufs Handy.</li>
   </ul>
 
   <h2><span class="num">08</span>Messen, was wirklich ankommt</h2>
