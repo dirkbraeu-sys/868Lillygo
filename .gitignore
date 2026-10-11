@@ -4,3 +4,5 @@
 *.elf
 include/secrets.h
 messdaten/
+redaktion/
+*.pdf
