@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>868-Funkempfänger</title>
+<style>
+  :root {
+    --paper: #f1f4f0; --paper-raised: #ffffff; --ink: #16211c; --ink-soft: #3c4a40;
+    --muted: #647567; --line: #d3ddd0; --accent: #c96a2e; --accent-ink: #ffffff;
+    --teal: #2f7a72; --teal-soft: #e4f0ec; --amber: #b9791f; --amber-soft: #f6ecd8;
+    --water: #1f6fb2; --water-soft: #e1eef8;
+    --code-bg: #eef1ea; --shadow: rgba(22, 33, 28, .10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #10160f; --paper-raised: #171e15; --ink: #eef2ea; --ink-soft: #c7d2c3;
+      --muted: #93a390; --line: #2b352a; --accent: #e2884a; --accent-ink: #10160f;
+      --teal: #5cb6a8; --teal-soft: #16332e; --amber: #e0ac54; --amber-soft: #2e2712;
+      --water: #6fb4ee; --water-soft: #14283a;
+      --code-bg: #1b231a; --shadow: rgba(0, 0, 0, .35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #10160f; --paper-raised: #171e15; --ink: #eef2ea; --ink-soft: #c7d2c3;
+    --muted: #93a390; --line: #2b352a; --accent: #e2884a; --accent-ink: #10160f;
+    --teal: #5cb6a8; --teal-soft: #16332e; --amber: #e0ac54; --amber-soft: #2e2712;
+    --water: #6fb4ee; --water-soft: #14283a;
+    --code-bg: #1b231a; --shadow: rgba(0, 0, 0, .35);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 46rem; margin: 0 auto; padding: clamp(2rem, 6vw, 4.5rem) 1.25rem clamp(4rem, 8vw, 6rem); }
+  .kicker { display: flex; align-items: center; gap: .6em; font-family: "IBM Plex Mono", monospace;
+    font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; color: var(--teal); margin-bottom: 1.1em; }
+  .kicker::before { content: ""; width: 2.1em; height: 2px; background: var(--accent); display: inline-block; }
+  h1 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: clamp(2.1rem, 6vw, 3.1rem);
+    line-height: 1.06; letter-spacing: -.01em; text-wrap: balance; margin: 0 0 .38em; }
+  h1 em { font-style: italic; color: var(--accent); }
+  .subhead { font-family: "Fraunces", Georgia, serif; font-weight: 400; font-style: italic;
+    font-size: clamp(1.05rem, 2.6vw, 1.28rem); line-height: 1.45; color: var(--ink-soft);
+    text-wrap: balance; margin: 0 0 1.6em; max-width: 34em; }
+  .byline { display: flex; flex-wrap: wrap; gap: .3em 1.4em; font-family: "IBM Plex Mono", monospace;
+    font-size: .78rem; color: var(--muted); border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line); padding: .8em 0; margin-bottom: 2.4em; }
+  .byline b { color: var(--ink-soft); font-weight: 600; }
+  p { line-height: 1.68; font-size: 1.03rem; margin: 0 0 1.15em; }
+  .lead { font-size: 1.16rem; line-height: 1.65; color: var(--ink-soft); }
+  .lead::first-letter { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 3.4em;
+    line-height: .82; float: left; margin: .03em .09em 0 0; color: var(--accent); }
+  h2 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: clamp(1.4rem, 3.4vw, 1.75rem);
+    line-height: 1.2; margin: 2.1em 0 .55em; text-wrap: balance; }
+  h2 .num { font-family: "IBM Plex Mono", monospace; font-weight: 500; font-size: .52em;
+    color: var(--accent); vertical-align: .32em; margin-right: .45em; }
+  h3 { font-weight: 600; font-size: 1.02rem; margin: 1.5em 0 .5em; color: var(--teal); }
+  a { color: var(--teal); text-decoration-thickness: 1.5px; text-underline-offset: 2px; }
+  a:hover { color: var(--accent); }
+  code, .mono { font-family: "IBM Plex Mono", monospace; font-size: .92em; background: var(--code-bg);
+    padding: .12em .38em; border-radius: 4px; }
+  strong { font-weight: 600; color: var(--ink); }
+  ul.feat { list-style: none; margin: 1em 0 1.4em; padding: 0; display: grid; gap: .55em; }
+  ul.feat li { position: relative; padding-left: 1.5em; line-height: 1.55; }
+  ul.feat li::before { content: ""; position: absolute; left: 0; top: .5em; width: .5em; height: .5em;
+    background: var(--teal); border-radius: 1px; transform: rotate(45deg); }
+  blockquote { margin: 1.8em -.2em; padding: .2em 0 .2em 1.15em; border-left: 3px solid var(--accent);
+    font-family: "Fraunces", Georgia, serif; font-style: italic; font-weight: 500;
+    font-size: clamp(1.15rem, 3vw, 1.4rem); line-height: 1.4; color: var(--ink); }
+  .diagram { background: var(--paper-raised); border: 1px solid var(--line); border-radius: 14px;
+    padding: 1.4em 1.2em 1.1em; margin: 1.8em 0; box-shadow: 0 8px 24px var(--shadow); }
+  .diagram svg { display: block; width: 100%; height: auto; }
+  .diagram-cap { font-family: "IBM Plex Mono", monospace; font-size: .74rem; color: var(--muted);
+    text-align: center; margin-top: .7em; letter-spacing: .02em; }
+  .box { background: var(--paper-raised); border: 1px solid var(--line); border-radius: 14px;
+    padding: 1.3em 1.4em; margin: 1.8em 0; box-shadow: 0 6px 18px var(--shadow); }
+  .box h3 { margin-top: 0; display: flex; align-items: center; gap: .5em; color: var(--ink); }
+  .box h3 .dot { width: .55em; height: .55em; border-radius: 50%; background: var(--teal); flex: none; }
+  .box p:last-child { margin-bottom: 0; }
+  .box.amber { border-color: color-mix(in srgb, var(--amber) 45%, var(--line)); }
+  .box.amber .dot { background: var(--amber); }
+  .box.water { border-color: color-mix(in srgb, var(--water) 45%, var(--line)); }
+  .box.water .dot { background: var(--water); }
+  .parts { list-style: none; margin: .9em 0 0; padding: 0; border-top: 1px solid var(--line); }
+  .parts li { display: flex; justify-content: space-between; align-items: baseline; gap: 1em;
+    padding: .68em 0; border-bottom: 1px solid var(--line); }
+  .parts .name { font-weight: 600; }
+  .parts .desc { color: var(--muted); font-size: .88rem; display: block; margin-top: .12em; font-weight: 400; }
+  .parts .price { font-family: "IBM Plex Mono", monospace; font-size: .95rem; white-space: nowrap;
+    color: var(--accent); font-weight: 600; }
+  .parts-total { display: flex; justify-content: space-between; padding-top: .9em; margin-top: .2em;
+    font-family: "IBM Plex Mono", monospace; font-size: .85rem; color: var(--muted); }
+  .steps { counter-reset: step; list-style: none; margin: 1em 0 0; padding: 0; display: grid; gap: 1em; }
+  .steps li { counter-increment: step; position: relative; padding-left: 2.5em; line-height: 1.55; }
+  .steps li::before { content: counter(step); position: absolute; left: 0; top: -.05em; width: 1.75em;
+    height: 1.75em; border-radius: 50%; background: var(--teal-soft); color: var(--teal);
+    font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: .85rem;
+    display: flex; align-items: center; justify-content: center; }
+  hr.orn { border: 0; text-align: center; margin: 2.6em 0; }
+  hr.orn::after { content: "◆ ◆ ◆"; color: var(--accent); letter-spacing: .5em; font-size: .7rem; }
+  .alarm-demo { background: #c0392b; color: #fff; border-radius: 10px; padding: .7em 1em; font-weight: 600; margin: 1.2em 0; }
+  table.tbl { width: 100%; border-collapse: collapse; margin: 1.2em 0; font-size: .92rem; }
+  table.tbl th, table.tbl td { text-align: left; padding: .5em .6em; border-bottom: 1px solid var(--line); vertical-align: top; }
+  table.tbl th { font-family: "IBM Plex Mono", monospace; font-size: .74rem; color: var(--muted);
+    text-transform: uppercase; letter-spacing: .06em; }
+  footer.article-end { margin-top: 3em; padding-top: 1.4em; border-top: 1px solid var(--line);
+    font-size: .88rem; color: var(--muted); line-height: 1.6; }
+  @media (max-width: 480px) { .parts li { flex-direction: column; gap: .2em; } }
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="kicker">Projekt · Smart Home / IoT</div>
+  <h1>Lüften auf <em>Zuruf</em> – und Alarm bei nassen Füßen</h1>
+  <p class="subhead">Ein 30-Euro-Board mit 868-MHz-Funk, ein paar handelsübliche Ecowitt-Sensoren und eine Prise KI: Aus dem Lüftungsberater für einen feuchten Wäschekeller wurde ein Funkempfänger, der auch Wasserlecks meldet, Kühlketten bewacht und jedes Sendetelegramm protokolliert.</p>
+
+  <div class="byline">
+    <span><b>Hardware</b> LilyGo LoRa32 V2.1 (ESP32 + SX1276)</span>
+    <span><b>Funk</b> 868,35 MHz, FSK, rtl_433</span>
+    <span><b>Alarm</b> ntfy.sh</span>
+    <span><b>Build</b> Claude Code</span>
+  </div>
+
+  <p class="lead">Nach der Erneuerung der Fenster und dem nachträglichen Anbringen einer Membran-Wärmedämmung stieg die Luftfeuchtigkeit in meinem Wäschekeller spürbar an. Die neue, dichtere Gebäudehülle hält die Wärme drin – aber eben auch die Feuchte, wenn man nicht gezielt gegensteuert. Die naheliegende Frage: Wann lohnt sich Lüften wirklich, und wann macht es die Sache nur schlimmer, weil draußen selbst schwüle Luft steht?</p>
+
+  <p>Um das zu beantworten, brauchte ich einen laufenden Vergleich zwischen innen und außen – und zwar nicht nur bei der relativen, sondern bei der <strong>absoluten</strong> Luftfeuchte. Nur die verrät, ob ein geöffnetes Fenster tatsächlich Feuchtigkeit abtransportiert oder nur warme, feuchte gegen kalte, ebenso feuchte Luft tauscht. Was als reiner Feuchtevergleich begann, ist inzwischen ein kleines Überwachungssystem für das ganze Haus.</p>
+
+  <h2><span class="num">01</span>Vom Kabelsalat zum Funk</h2>
+
+  <p>Der erste Prototyp war denkbar einfach: ein DHT22-Sensor an einem ESP32 mit kleinem Display. Funktional – aber lästig. Für jeden weiteren Messpunkt musste ein Kabel durch Wand oder Decke, und ein Außenfühler bedeutete zwangsläufig ein Loch nach draußen.</p>
+
+  <p>Die Lösung lag näher, als gedacht: Handelsübliche Funksensoren senden ohnehin permanent – batteriebetrieben, wetterfest, für kleines Geld erhältlich. Man muss sie nur empfangen können. Die Wahl fiel auf ein <strong>LilyGo-LoRa32-V2.1-Board</strong> in der 868-MHz-Ausführung: ein ESP32 mit eingebautem SX1276-Funkmodul, OLED-Display, LED und Antennenbuchse. Alle Sensoren in diesem Artikel funken auf <strong>868,35&nbsp;MHz</strong> – ein einziges Board hört sie alle.</p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 640 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Systemübersicht">
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"></path>
+        </marker>
+      </defs>
+      <g font-family="IBM Plex Mono, monospace" font-size="12" fill="var(--ink-soft)">
+        <rect x="10" y="10" width="138" height="52" rx="9" fill="var(--teal-soft)" stroke="var(--teal)" stroke-width="1.3"></rect>
+        <text x="79" y="32" text-anchor="middle" font-weight="600" fill="var(--teal)">Temp./Feuchte</text>
+        <text x="79" y="50" text-anchor="middle" fill="var(--muted)">WH31E · 868 MHz</text>
+
+        <rect x="10" y="98" width="138" height="52" rx="9" fill="var(--water-soft)" stroke="var(--water)" stroke-width="1.3"></rect>
+        <text x="79" y="120" text-anchor="middle" font-weight="600" fill="var(--water)">Wasserleck</text>
+        <text x="79" y="138" text-anchor="middle" fill="var(--muted)">WH55 · 868 MHz</text>
+
+        <rect x="10" y="186" width="138" height="52" rx="9" fill="var(--teal-soft)" stroke="var(--teal)" stroke-width="1.3"></rect>
+        <text x="79" y="208" text-anchor="middle" font-weight="600" fill="var(--teal)">weitere Sensoren</text>
+        <text x="79" y="226" text-anchor="middle" fill="var(--muted)">Kühlschrank, Außen</text>
+
+        <rect x="226" y="80" width="170" height="90" rx="10" fill="var(--paper)" stroke="var(--accent)" stroke-width="1.6"></rect>
+        <text x="311" y="108" text-anchor="middle" font-weight="600" fill="var(--ink)">LilyGo LoRa32</text>
+        <text x="311" y="126" text-anchor="middle" fill="var(--muted)">ESP32 + SX1276</text>
+        <text x="311" y="144" text-anchor="middle" fill="var(--muted)">Web · OLED · LED</text>
+
+        <rect x="458" y="80" width="80" height="90" rx="10" fill="var(--amber-soft)" stroke="var(--amber)" stroke-width="1.3"></rect>
+        <text x="498" y="120" text-anchor="middle" font-weight="600" fill="var(--amber)">ntfy.sh</text>
+        <text x="498" y="138" text-anchor="middle" fill="var(--muted)">Push</text>
+
+        <rect x="580" y="94" width="46" height="62" rx="8" fill="var(--paper-raised)" stroke="var(--ink-soft)" stroke-width="1.2"></rect>
+        <rect x="588" y="102" width="30" height="42" rx="2" fill="var(--teal-soft)"></rect>
+        <text x="603" y="172" text-anchor="middle" fill="var(--muted)" font-size="11">Handy</text>
+
+        <path d="M148,36 L224,108" stroke="var(--muted)" stroke-width="1.4" fill="none" marker-end="url(#arrow)"></path>
+        <path d="M148,124 L224,125" stroke="var(--muted)" stroke-width="1.4" fill="none" marker-end="url(#arrow)"></path>
+        <path d="M148,212 L224,142" stroke="var(--muted)" stroke-width="1.4" fill="none" marker-end="url(#arrow)"></path>
+        <path d="M396,125 L456,125" stroke="var(--muted)" stroke-width="1.4" fill="none" marker-end="url(#arrow)"></path>
+        <path d="M538,125 L578,125" stroke="var(--muted)" stroke-width="1.4" fill="none" marker-end="url(#arrow)"></path>
+        <text x="426" y="115" text-anchor="middle" font-size="10" fill="var(--muted)">WLAN</text>
+      </g>
+    </svg>
+    <div class="diagram-cap">SENSOREN (868 MHZ) → EMPFÄNGER (ESP32) → NTFY.SH → SMARTPHONE</div>
+  </div>
+
+  <h2><span class="num">02</span>Ein Empfänger, der einfach alles hört</h2>
+
+  <p>Statt eines festen Sensor-Paars protokolliert der Empfänger zunächst <strong>jeden</strong> 868-MHz-Sensor in Reichweite. Dafür sorgt die Bibliothek <code>rtl_433_ESP</code>, die auf dem SX1276 im Dauerempfang läuft und dutzende gängige Funkprotokolle decodiert. Über eine kleine Weboberfläche legt man mit einem Häkchen fest, welche Sensoren „eigen” sind – nur die erscheinen auf Startseite und Display.</p>
+
+  <ul class="feat">
+    <li><strong>Startseite</strong> – große Kacheln je Sensor: Temperatur, relative <em>und</em> absolute Luftfeuchte, Verlaufsgrafik der letzten Stunde, Feldstärke (RSSI) und Alter des letzten Telegramms.</li>
+    <li><strong>Sensorverwaltung</strong> – Häkchen für „eigen”, freier Anzeigename statt kryptischer Sensor-ID.</li>
+    <li><strong>Schwellenwerte</strong> – je Sensor Ober-/Untergrenzen für Temperatur und Feuchte, mit Hysterese gegen Alarm-Flattern.</li>
+    <li><strong>WLAN-Portal</strong> – Zugangsdaten jederzeit im Browser ändern, zwei Netze mit automatischem Umschalten; findet das Board keines, spannt es selbst einen Hotspot mit eigener Einrichtungsseite auf.</li>
+    <li><strong>Updates per Funk</strong> – neue Firmware geht drahtlos per OTA aufs Board, der USB-Anschluss bleibt für den Notfall.</li>
+  </ul>
+
+  <div class="box">
+    <h3><span class="dot"></span>Fremde Sender als Testmaterial</h3>
+    <p>Wer noch keinen eigenen Sensor hat, muss nicht warten: Weil der Empfänger ungefiltert jedes Telegramm mitschreibt, taucht oft schon nach Minuten die Wetterstation eines Nachbarn auf. Die kann man für erste Tests der Oberfläche oder des Referenzvergleichs einfach mitnutzen.</p>
+  </div>
+
+  <h2><span class="num">03</span>FSK statt OOK: Warum anfangs nichts ankam</h2>
+
+  <p>Der erste Start war ernüchternd: Das Board lief, die Weboberfläche war da – und „0 von 0 Sensoren gesehen”. Die Ursache steckt in der Funktechnik: Viele 433-MHz-Wettersensoren nutzen <strong>OOK</strong> (Ein-Aus-Tastung), die Ecowitt-Sensoren auf 868&nbsp;MHz dagegen <strong>FSK</strong> (Frequenzumtastung). Die Bibliothek kann pro Firmware aber nur <em>eine</em> der beiden Modulationen empfangen; sie wird beim Kompilieren festgelegt. Ein OOK-Build sieht die 868-MHz-Sensoren nie.</p>
+
+  <p>Mit <code>-DOOK_MODULATION=false</code>, 868,35&nbsp;MHz und einer angepassten Mindest-Signallänge lief es sofort: Der Sensor meldete sich alle 61 Sekunden, Kanal 1 und 2 mit leicht unterschiedlichem Takt (61 bzw. 62&nbsp;s), damit sich mehrere Sensoren nicht dauerhaft überlagern.</p>
+
+  <div class="box amber">
+    <h3><span class="dot"></span>Nicht jedes Funkboard taugt</h3>
+    <p>Ein Heltec-WiFi-LoRa-32-V3 mit SX1262 scheiterte: Der Chip liefert keinen rohen Bitstrom, den die rtl_433-Dekoder brauchen. Geeignet sind SX127x-Boards wie das LoRa32 V2.1 oder ein CC1101-Modul.</p>
+  </div>
+
+  <h2><span class="num">04</span>Warum absolute statt relativer Feuchte?</h2>
+
+  <p>Relative Luftfeuchte allein täuscht: Kalte Luft <em>wirkt</em> feuchter als warme, selbst wenn sie weniger Wasser trägt. Der Empfänger rechnet deshalb aus Temperatur und relativer Feuchte über die Magnus-Formel die <strong>absolute Feuchte</strong> in Gramm Wasserdampf pro Kubikmeter aus – und zeigt sie groß neben den anderen Werten an.</p>
+
+  <h2><span class="num">05</span>Referenzvergleich und Lüftungsempfehlung</h2>
+
+  <p>In den Einstellungen wird ein Sensor als <strong>Referenz</strong> markiert – bei mir der Außenfühler. Für jeden anderen Sensor lässt sich ein Vergleich zuschalten: Übersteigt die Differenz der absoluten Feuchte einen Grenzwert, steht drinnen spürbar mehr Wasserdampf als draußen.</p>
+
+  <blockquote>Übersteigt die Differenz einen Schwellenwert, erscheint auf der Startseite eine grüne Lüftungsempfehlung – und verschwindet erst wieder, wenn ein zweiter, niedrigerer Schwellenwert unterschritten wird.</blockquote>
+
+  <p>Die Zwei-Schwellen-Logik (Hysterese) verhindert Flackern, und sie prüft die Richtung: Nur wenn der Innensensor tatsächlich <em>feuchter</em> ist als die Referenz, macht Lüften Sinn. Die Empfehlung erscheint auch auf dem Display und als dauerhaft leuchtende Onboard-LED – ganz ohne WLAN.</p>
+
+  <hr class="orn">
+
+  <h2><span class="num">06</span>Neu: Wasserleck-Melder für Waschmaschine und Keller</h2>
+
+  <p>Die jüngste Erweiterung: Der <strong>Ecowitt WH55</strong>, ein batteriebetriebener Wassermelder mit Kontaktfühler, sendet ebenfalls auf 868,35&nbsp;MHz. Zunächst erschien er nicht im Board: Die Firmware verwarf alles ohne Temperatur- und Feuchtewert. Eine kleine Diagnoseseite <code>/andere</code> zeigte dann die verworfenen Telegramme – darunter das des WH55 mit Kennung, Kanal, <code>battery_ok</code>, <code>alarm</code> und einem Rohwert, der trocken bei etwa 730 liegt und nass auf rund 250 fällt.</p>
+
+  <p>Seitdem hat der Empfänger eine eigene Seite <code>/wasser</code>:</p>
+
+  <ul class="feat">
+    <li><strong>Sensoren automatisch anlegen</strong> – bis zu vier Wassermelder, die sich beim ersten Telegramm von selbst eintragen; Namen wie „Waschmaschine” oder „Keller” vergibt man im Browser, sie bleiben dauerhaft gespeichert.</li>
+    <li><strong>Alarm auf allen Kanälen</strong> – rotes Banner auf der Startseite, blinkende Vollbild-Warnung „WASSER!” samt Sensorname auf dem OLED, schnell blinkende LED und eine ntfy-Push-Nachricht aufs Handy.</li>
+    <li><strong>Entwarnung</strong> – wird es wieder trocken, kommt eine zweite Meldung.</li>
+    <li><strong>Batteriewächter</strong> – „schwach” bei unter 50&nbsp;%, „leer” beim letzten Balken, danach täglich eine Erinnerung, bis die Batterie getauscht ist.</li>
+    <li><strong>Verschwunden-Meldung</strong> – meldet sich ein Wassermelder 15 Minuten nicht mehr (etwa weil die Batterie ganz leer ist), kommt ebenfalls eine Warnung.</li>
+    <li><strong>Testknopf</strong> – ein Klick sendet eine Testnachricht und prüft damit die ganze Kette bis zum Handy.</li>
+  </ul>
+
+  <div class="alarm-demo">💧 WASSER ERKANNT: Waschmaschine</div>
+
+  <p>Im Test genügte es, Batterie kurz herauszunehmen und die Kontakte zu befeuchten: Binnen weniger Sekunden stand die Nachricht auf dem Handy, neun Sekunden nach dem Abtrocknen folgte die Entwarnung.</p>
+
+  <div class="box water">
+    <h3><span class="dot"></span>Alarm auch ohne Internet</h3>
+    <p>Der Empfänger wertet den Wasseralarm lokal aus: OLED und LED schlagen auch dann an, wenn Router oder Internet ausgefallen sind – nur die Handy-Nachricht braucht die Verbindung.</p>
+  </div>
+
+  <h2><span class="num">07</span>Zweites Leben: Wächter für Kühlschrank oder Gefriertruhe</h2>
+
+  <p>Parallel entstand ein unabhängiges Projekt: eine Lösung für Betriebe wie Bäckereien, die nach einem Stromausfall sofort eine Nachricht bekommen sollen, wenn Kühlschrank oder Gefriertruhe zu warm werden. Technisch braucht es dieselbe Basis wie der Lüftungsberater: Funkempfang, Grenzwertüberwachung, verlässliche Alarmierung.</p>
+
+  <ul class="feat">
+    <li><strong>Signalverlust</strong> – meldet sich ein Sensor 15 Minuten nicht mehr, kommt eine Warnung (und eine Entwarnung, sobald der Empfang zurück ist).</li>
+    <li><strong>Batteriezustand</strong> – steckt im Funktelegramm und wird automatisch mitüberwacht.</li>
+    <li><strong>Einzeln abschaltbare Meldungen</strong> – jeder Grenzwert lässt sich separat stummschalten, ohne dass die farbliche Warnung auf der Startseite verloren geht.</li>
+  </ul>
+
+  <div class="box amber">
+    <h3><span class="dot"></span>Warum ntfy?</h3>
+    <p><a href="https://ntfy.sh">ntfy.sh</a> ist ein simpler, quelloffener Push-Dienst: Ein einziger HTTP-POST an eine selbst gewählte Themen-URL genügt – kein eigener Server, kein Konto. Auf dem Handy die kostenlose ntfy-App installieren und dasselbe Thema abonnieren. Weil das Board aus Speichergründen ohne TLS sendet, wird ein zufälliges, nicht erratbares Thema verwendet; ntfy-Themen sind sonst öffentlich lesbar.</p>
+  </div>
+
+  <h2><span class="num">08</span>Messen, was wirklich ankommt</h2>
+
+  <p>Wer sich auf Funk verlässt, will wissen, wie zuverlässig er ist. Der Empfänger liefert deshalb zu jedem Telegramm die Feldstärke (RSSI) mit, und ein kleines PowerShell-Skript schreibt jedes Sendetelegramm samt Zeitstempel in eine CSV-Datei. Eine Stunde Mitschrift ergab:</p>
+
+  <table class="tbl">
+    <thead><tr><th>Messgröße</th><th>Ergebnis</th></tr></thead>
+    <tbody>
+      <tr><td>Sendeintervall WH31E</td><td>61,0&nbsp;s (±0,1&nbsp;s), Kanal 2 etwa 62&nbsp;s</td></tr>
+      <tr><td>Ausfälle</td><td>etwa ein Telegramm pro Stunde, unabhängig von der Signalstärke</td></tr>
+      <tr><td>Reichweitengrenze</td><td>etwa −90&nbsp;dBm; darunter geht jedes dritte Telegramm verloren</td></tr>
+      <tr><td>Wassermelder neben der Antenne</td><td>−29 bis −49&nbsp;dBm</td></tr>
+    </tbody>
+  </table>
+
+  <p>Für Alarmzwecke ist das unkritisch: Selbst bei einem verlorenen Telegramm sendet der Sensor 61&nbsp;Sekunden später wieder.</p>
+
+  <h2><span class="num">09</span>Ohne WLAN, aber mit Verlauf – oder umgekehrt</h2>
+
+  <p>Wer auf Push-Nachrichten verzichtet oder gar kein WLAN bereitstellen will, verliert nichts Grundlegendes: Grenzwerte und Referenzvergleich laufen lokal auf dem ESP32, die Werte erscheinen auf dem OLED, die Lüftungsempfehlung zeigt die Onboard-LED. Wer dagegen den <strong>Verlauf über Wochen</strong> sehen möchte, kann den Empfänger per Compiler-Schalter an <a href="https://thingspeak.com">ThingSpeak</a> anbinden: Die Werte landen alle 60&nbsp;Sekunden in der Cloud, samt Diagrammen und Export – etwas, das der Ringpuffer im Arbeitsspeicher des Boards bei jedem Neustart verliert.</p>
+
+  <h2><span class="num">10</span>Selber bauen – auch ohne Vorkenntnisse</h2>
+
+  <blockquote>Programmieren war noch nie so einfach: Board anstecken, Wunsch in einem Satz formulieren – und Claude Code schreibt, kompiliert und flasht auf Zuruf, was gebraucht wird.</blockquote>
+
+  <p>Der komplette Empfänger ist ein offenes PlatformIO-Projekt. Wer selbst loslegen will, muss keine Zeile C++ können: Mit <strong>Claude Code</strong>, Anthropics KI-Programmierwerkzeug, lässt sich das Projekt im Dialog entwickeln. Die Wasserleck-Funktion beispielsweise entstand im Dialog: Sensor an die Antenne legen, Telegramm ansehen, Funktion beschreiben, testen, Batteriemeldung nachwünschen.</p>
+
+  <ul class="steps">
+    <li>Claude Code installieren und einen Projektordner anlegen (oder das GitHub-Repository klonen).</li>
+    <li>In eigenen Worten beschreiben, was gebaut werden soll – etwa „ein LilyGo-Board soll 868-MHz-Sensoren empfangen und bei Wasser eine ntfy-Nachricht schicken”.</li>
+    <li>Die KI schlägt Bauteile und Struktur vor, schreibt den Code und fragt nach, wo eigene Entscheidungen nötig sind.</li>
+    <li>Board per USB anschließen und flashen lassen; spätere Änderungen gehen drahtlos per OTA.</li>
+  </ul>
+
+  <div class="box">
+    <h3><span class="dot"></span>Bauteile &amp; Kosten</h3>
+    <ul class="parts">
+      <li>
+        <div><span class="name">LilyGo LoRa32 V2.1, 868&nbsp;MHz</span><span class="desc">ESP32 · SX1276 · OLED · LED · Antenne</span></div>
+        <span class="price">≈ 30&nbsp;€</span>
+      </li>
+      <li>
+        <div><span class="name">Ecowitt WH31E / baugleiche 868-MHz-Sensoren</span><span class="desc">Temperatur und Feuchte, batteriebetrieben</span></div>
+        <span class="price">ab ≈ 15&nbsp;€</span>
+      </li>
+      <li>
+        <div><span class="name">Ecowitt WH55</span><span class="desc">Wassermelder mit Kontaktfühler, 868&nbsp;MHz</span></div>
+        <span class="price">ab ≈ 20&nbsp;€</span>
+      </li>
+      <li>
+        <div><span class="name">USB-Kabel + Netzteil</span><span class="desc">meist schon vorhanden</span></div>
+        <span class="price">–</span>
+      </li>
+      <li>
+        <div><span class="name">Claude Code</span><span class="desc">optional, nur für die Entwicklung – Monatsabo</span></div>
+        <span class="price">ab 22&nbsp;€/Monat</span>
+      </li>
+    </ul>
+    <div class="parts-total"><span>Pro zusätzlichem Messpunkt</span><span>+15 bis 20&nbsp;€</span></div>
+  </div>
+
+  <h2><span class="num">11</span>Fazit</h2>
+
+  <p>Aus einer einfachen Beobachtung – „warum wird’s im Keller feuchter?” – ist ein vielseitiges Überwachungssystem geworden: automatische Lüftungsempfehlung, Kälteausfall-Alarm für Kühlschrank und Gefriertruhe, Wasserleck-Alarm für Waschmaschine und Keller, dazu ein Funk-Logger für die eigene Neugier. Alles auf einem einzigen 30-Euro-Board, alles auf einer Frequenz. Der Aufwand steckte nicht im Löten, sondern im Zusammenspiel aus Funkempfang, Schwellenwerten und Benachrichtigung – und dafür war ein KI-gestützter Entwicklungsprozess ausgesprochen praktisch.</p>
+
+  <footer class="article-end">
+    Projektunterlagen, vollständiger Quellcode und Aufbauanleitung: GitHub-Repository <a href="https://github.com/dirkbraeu-sys/868SensorenMitntfyAlarm">github.com/dirkbraeu-sys/868SensorenMitntfyAlarm</a>.
+  </footer>
+
+</div>
+</body>
+</html>
