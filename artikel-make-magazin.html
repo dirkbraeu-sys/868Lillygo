@@ -110,6 +110,48 @@
   footer.article-end { margin-top: 3em; padding-top: 1.4em; border-top: 1px solid var(--line);
     font-size: .88rem; color: var(--muted); line-height: 1.6; }
   @media (max-width: 480px) { .parts li { flex-direction: column; gap: .2em; } }
+
+  /* ---------- Bildschirm: Bilder dezenter ---------- */
+  figure.shot { max-width: 30rem; margin-left: auto; margin-right: auto; }
+  figure.shot img { box-shadow: 0 4px 14px var(--shadow); }
+  .diagram { max-width: 38rem; margin-left: auto; margin-right: auto; }
+
+  /* ---------- Druck / PDF: Zeitschriftenlayout ---------- */
+  @page {
+    size: A4;
+    margin: 16mm 15mm 18mm 15mm;
+    @bottom-left   { content: "MAKE · 868-Funkempfänger"; font: 8pt "IBM Plex Mono", monospace; color: #647567; }
+    @bottom-right  { content: counter(page); font: 8pt "IBM Plex Mono", monospace; color: #647567; }
+  }
+  @media print {
+    :root { --paper: #ffffff; --paper-raised: #ffffff; --shadow: transparent; }
+    body { background: #fff; color: #16211c; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .wrap { max-width: none; padding: 0; column-count: 2; column-gap: 9mm; column-fill: balance; }
+    .kicker, h1, .subhead, .byline, footer.article-end { column-span: all; }
+    h1 { font-size: 27pt; margin-bottom: .25em; }
+    .subhead { font-size: 12.5pt; max-width: none; margin-bottom: 1em; text-align: left; hyphens: manual; }
+    .byline { font-size: 7.5pt; margin-bottom: 1.4em; }
+    p { font-size: 9.6pt; line-height: 1.5; margin-bottom: .8em; text-align: justify; hyphens: auto; orphans: 3; widows: 3; }
+    .lead { font-size: 10.6pt; line-height: 1.5; }
+    .lead::first-letter { font-size: 3.2em; }
+    h2 { font-size: 14pt; margin: 1.3em 0 .45em; break-after: avoid; break-inside: avoid; }
+    h3 { break-after: avoid; }
+    ul.feat li, .steps li { font-size: 9.4pt; line-height: 1.45; break-inside: avoid; }
+    ul.feat { gap: .4em; margin: .6em 0 1em; }
+    blockquote { margin: 1em 0; font-size: 11.5pt; break-inside: avoid; }
+    figure.shot, .diagram, .box, table.tbl, .parts li, .steps li { break-inside: avoid; }
+    figure.shot { max-width: none; margin: .9em 0 1.1em; }
+    figure.shot img { max-height: 95mm; width: auto; max-width: 100%; margin: 0 auto; box-shadow: none; border-radius: 6px; }
+    figure.shot figcaption, .diagram-cap { font-size: 6.8pt; }
+    .diagram { max-width: none; margin: .9em 0 1.1em; padding: .8em .8em .6em; box-shadow: none; }
+    .box { padding: .8em .9em; margin: 1em 0; box-shadow: none; }
+    .box p { text-align: left; font-size: 9.2pt; }
+    table.tbl { font-size: 8.6pt; }
+    hr.orn { margin: 1.2em 0; break-after: avoid; }
+    code, .mono { font-size: .85em; }
+    a { color: inherit; text-decoration: none; }
+    footer.article-end { margin-top: 1.4em; font-size: 8.5pt; }
+  }
 </style>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 </head>
@@ -287,11 +329,6 @@
     <li><strong>Batteriezustand</strong> – steckt im Funktelegramm und wird automatisch mitüberwacht.</li>
     <li><strong>Einzeln abschaltbare Meldungen</strong> – jeder Grenzwert lässt sich separat stummschalten, ohne dass die farbliche Warnung auf der Startseite verloren geht.</li>
   </ul>
-
-  <div class="box">
-    <h3><span class="dot"></span>Tipps für den Einsatz in der Kälte</h3>
-    <p>Der Sensor gehört ins Innere des Geräts. Metall und Dichtungen dämpfen das Funksignal – die Anzeige der Feldstärke (RSSI) in der Weboberfläche zeigt, ob der Empfang reicht, und sonst hilft ein anderer Platz für das Board. Bei Dauerkälte lassen die Batterien schneller nach; für Gefriergeräte sind Lithium-Batterien die bessere Wahl. Schwächeln sie trotzdem, meldet sie der Batteriewächter rechtzeitig.</p>
-  </div>
 
   <div class="box amber">
     <h3><span class="dot"></span>Warum ntfy?</h3>
