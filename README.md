@@ -43,3 +43,21 @@ Wassersensoren · `/wifi` WLAN · `/display` OLED-Seiten · `/andere` übrige Te
 
 `tools/sendezyklen-log-seriell.ps1` und `tools/sendezyklen-log-http.ps1` protokollieren
 jedes Telegramm (Zeit, Sensor, RSSI) in eine CSV-Datei.
+
+## Wassersensor-Details
+
+- Erkannt werden Modelle, deren Name `WH55` oder `Leak` enthält und die ein Feld `alarm` liefern.
+- Trockenwert (`raw_value`) beim WH55 etwa 730, nass etwa 200–260.
+- Batterie: schwach unter 50 %, leer beim letzten Balken (20 %), danach tägliche Erinnerung.
+- Namen und Sensoridentität liegen im NVS (Namespace `leak`), bis zu 4 Sensoren.
+
+## Artikel
+
+`artikel-make-magazin.html` (Screenshots in `bilder/`) beschreibt Aufbau, FSK-Stolperstein,
+Referenzvergleich, Wasserleck-Melder und Messergebnisse.
+
+## Entwicklungsnotizen
+
+- `platformio.ini` enthält im Repo den Platzhalter `DEIN_OTA_PASSWORT`.
+- Beim Schreiben von C-Strings mit `\n` per Skript auf unbeabsichtigte echte Zeilenumbrüche achten.
+- Flash ist zu etwa 93 % belegt; ein Dekoder-Subset (`MY_DEVICES`) würde Platz schaffen.
