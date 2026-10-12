@@ -2029,7 +2029,7 @@ static GaugeCfg gaugeCfg(int q) {
     default:   return {-3.0f, 6.0f, 0.5f, 1.0f, 1, "g/m3", true};
   }
 }
-static const int   GAUGE_CX = 64, GAUGE_CY = 47, GAUGE_R_OUT = 43, GAUGE_R_IN = 34;
+static const int   GAUGE_CX = 64, GAUGE_CY = 47, GAUGE_R_OUT = 43, GAUGE_R_IN = 39;   // schlankes Band (4 px)
 static const float PI_F = 3.14159265f;
 
 static float gaugeAngle(float v, const GaugeCfg &g) {   // Minimum -> 180 Grad (links), Maximum -> 0 Grad (rechts)
@@ -2044,18 +2044,20 @@ static void gaugeLine(float ang, float r0, float r1) {
                 GAUGE_CX + (int)lroundf(r1 * cosf(ang)), GAUGE_CY - (int)lroundf(r1 * sinf(ang)));
 }
 
-// style 0 = Umriss (gruen), 1 = schraffiert (gelb), 2 = voll (rot)
+// Schlankes Band: style 0 = eine feine Linie (gruen), 1 = Umriss aus zwei Linien (gelb),
+// 2 = voll (rot). Zonengrenzen sind kurze Querstriche.
+static void gaugeArc(float a0, float a1, float r) {
+  for (float a = a1; a <= a0 + 0.001f; a += 0.007f)
+    u8g2.drawPixel(GAUGE_CX + (int)lroundf(r * cosf(a)), GAUGE_CY - (int)lroundf(r * sinf(a)));
+}
+
 static void gaugeBand(float v0, float v1, int style, const GaugeCfg &g) {
   float a0 = gaugeAngle(v0, g), a1 = gaugeAngle(v1, g);   // a0 >= a1
-  if (style == 2) {                                       // fein genug, damit keine Luecken bleiben
+  if (style == 2) {
     for (float a = a1; a <= a0 + 0.001f; a += 0.006f) gaugeLine(a, GAUGE_R_IN, GAUGE_R_OUT);
   } else {
-    for (float a = a1; a <= a0 + 0.001f; a += 0.008f) {   // Bogenkanten als Punktreihe
-      u8g2.drawPixel(GAUGE_CX + (int)lroundf(GAUGE_R_OUT * cosf(a)), GAUGE_CY - (int)lroundf(GAUGE_R_OUT * sinf(a)));
-      u8g2.drawPixel(GAUGE_CX + (int)lroundf(GAUGE_R_IN * cosf(a)),  GAUGE_CY - (int)lroundf(GAUGE_R_IN * sinf(a)));
-    }
-    if (style == 1)
-      for (float a = a1; a <= a0; a += 0.06f) gaugeLine(a, GAUGE_R_IN, GAUGE_R_OUT);
+    gaugeArc(a0, a1, GAUGE_R_OUT);
+    if (style == 1) gaugeArc(a0, a1, GAUGE_R_IN);
   }
   gaugeLine(a0, GAUGE_R_IN, GAUGE_R_OUT);                // Zonengrenzen
   gaugeLine(a1, GAUGE_R_IN, GAUGE_R_OUT);
@@ -2076,7 +2078,12 @@ static void drawGaugePage() {
   } else {
     gaugeBand(g.mn, g.mx, 0, g);
   }
-  gaugeLine(gaugeAngle(0, g), GAUGE_R_OUT + 1, GAUGE_R_OUT + 4);
+  {
+    float span = g.mx - g.mn, step = span <= 12.0f ? 1.0f : span / 10.0f;
+    for (float v = g.mn; v <= g.mx + 0.001f; v += step)
+      gaugeLine(gaugeAngle(v, g), GAUGE_R_IN - 1, GAUGE_R_IN - 3);        // feine Teilstriche innen
+  }
+  gaugeLine(gaugeAngle(0, g), GAUGE_R_IN - 1, GAUGE_R_IN - 6);            // Nullmarke, etwas laenger
   u8g2.setFont(u8g2_font_5x8_tf);
   char lim[8];
   snprintf(lim, sizeof(lim), "%.0f", g.mn);
@@ -2106,25 +2113,23 @@ static void drawGaugePage() {
   float tr;
   if (ok && trendGauge && gaugeTrend(q, d, tr)) drawTrendMark(111, 54, tr, q);
 
-  // Zeiger als richtiger Pfeil: 2 px dicker Schaft vom Drehpunkt bis zur Spitze und eine lange,
-  // spitze Pfeilspitze; schwarzer Rand um die Spitze, damit sie auf der gefuellten Zone sichtbar bleibt.
+  // Zeiger: feine 1-px-Linie mit schmaler Spitze, schwarzer Saum, damit sie ueber der roten Zone sichtbar bleibt.
   if (ok) {
-    const float TIP = 42, BASE = 27, HW = 5;                   // Spitze/Kopf-Basis (Radius) und halbe Kopfbreite
+    const float TIP = 41, BASE = 33, HW = 2.5f;
     float th = gaugeAngle(d, g), c = cosf(th), s = sinf(th);
-    float bx = GAUGE_CX + BASE * c, by = GAUGE_CY - BASE * s;  // Mitte der Kopf-Basis
-    int ox = (int)lroundf(s), oy = (int)lroundf(c);            // 1 px seitlich fuer einen dickeren Schaft
+    float bx = GAUGE_CX + BASE * c, by = GAUGE_CY - BASE * s;
     u8g2.setDrawColor(0);
-    u8g2.drawTriangle((int)lroundf(GAUGE_CX + (TIP + 2.5f) * c), (int)lroundf(GAUGE_CY - (TIP + 2.5f) * s),
-                      (int)lroundf(bx - 1.2f * c + 7.5f * s), (int)lroundf(by + 1.2f * s + 7.5f * c),
-                      (int)lroundf(bx - 1.2f * c - 7.5f * s), (int)lroundf(by + 1.2f * s - 7.5f * c));
+    u8g2.drawTriangle((int)lroundf(GAUGE_CX + (TIP + 1.5f) * c), (int)lroundf(GAUGE_CY - (TIP + 1.5f) * s),
+                      (int)lroundf(bx + (HW + 1.5f) * s), (int)lroundf(by + (HW + 1.5f) * c),
+                      (int)lroundf(bx - (HW + 1.5f) * s), (int)lroundf(by - (HW + 1.5f) * c));
     u8g2.setDrawColor(1);
-    u8g2.drawLine(GAUGE_CX, GAUGE_CY, (int)lroundf(bx), (int)lroundf(by));
-    u8g2.drawLine(GAUGE_CX + ox, GAUGE_CY + oy, (int)lroundf(bx) + ox, (int)lroundf(by) + oy);
+    u8g2.drawLine(GAUGE_CX + (int)lroundf(5 * c), GAUGE_CY - (int)lroundf(5 * s), (int)lroundf(bx), (int)lroundf(by));
     u8g2.drawTriangle((int)lroundf(GAUGE_CX + TIP * c), (int)lroundf(GAUGE_CY - TIP * s),
                       (int)lroundf(bx + HW * s), (int)lroundf(by + HW * c),
                       (int)lroundf(bx - HW * s), (int)lroundf(by - HW * c));
   }
-  u8g2.drawDisc(GAUGE_CX, GAUGE_CY, 3);
+  u8g2.drawCircle(GAUGE_CX, GAUGE_CY, 4);        // Nabe: Ring mit Punkt statt grosser Scheibe
+  u8g2.drawDisc(GAUGE_CX, GAUGE_CY, 1);
 }
 
 /* ---- 4d) Sensor-Vergleich: dieselbe Groesse von zwei Sensoren nebeneinander ----
