@@ -2657,6 +2657,24 @@ static void handleAndere() {
   server.send(200, "text/plain; charset=utf-8", o);
 }
 
+#if USE_RADIO
+// Funkstatus: Rauschgrundpegel, aktuelle Schwelle und Zaehler (erfasst / dekodiert / ohne Dekodierung).
+// "ohne Dekodierung" sind Signale, die die Schwelle ueberschritten haben, aber kein Protokoll ergaben
+// (typisch: Rauschen oder fremde Sender) - ideal, um die RSSI-Schwelle einzustellen.
+static void handleFunk() {
+  rtl_433_ESPStatus st = rf.statusSnapshot();
+  char b[320];
+  snprintf(b, sizeof(b),
+           "{\"noise_dbm\":%d,\"threshold_dbm\":%d,\"delta_db\":%d,\"current_dbm\":%d,"
+           "\"captured\":%lu,\"decoded_signals\":%lu,\"decoded_messages\":%lu,\"zero_decoded\":%lu,"
+           "\"dropped\":%lu,\"uptime_s\":%lu}",
+           (int)st.averageRssi, (int)st.rssiThreshold, rssiSensitivity, (int)st.currentRssi,
+           (unsigned long)st.capturedSignals, (unsigned long)st.decodedSignals, (unsigned long)st.decodedMessages,
+           (unsigned long)st.zeroDecodedSignals, (unsigned long)st.droppedCaptureBuffers, (unsigned long)(millis() / 1000UL));
+  server.send(200, "application/json", b);
+}
+#endif
+
 static void handleJson() {
   DynamicJsonDocument doc(4096);
   JsonArray arr = doc.to<JsonArray>();
@@ -4370,6 +4388,9 @@ static void startNetServices() {
   ArduinoOTA.begin();
   server.on("/", handleRoot);
   server.on("/json", handleJson);
+#if USE_RADIO
+  server.on("/funk", handleFunk);
+#endif
   server.on("/andere", handleAndere);
   server.on("/wasser", HTTP_GET, handleWasserGet);
   server.on("/wasser", HTTP_POST, handleWasserPost);
