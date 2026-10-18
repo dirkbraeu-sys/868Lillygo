@@ -1428,9 +1428,16 @@ static void leakLabel(const LeakSensor &l, char *out, size_t n) {
   else snprintf(out, n, "Wassersensor Kanal %d", (int)l.channel);
 }
 
+// Aktiver Alarm: Wasser gemeldet und der Sensor sendet noch. Verstummt ein Sensor im Alarmzustand,
+// bleibt der letzte Stand sichtbar (Banner), blinkt aber nicht endlos und kann quittiert werden.
 static bool leakAnyAlarm() {
   for (int i = 0; i < LEAK_MAX; i++)
-    if (leaks[i].used && leaks[i].alarm) return true;
+    if (leaks[i].used && leaks[i].alarm && !leaks[i].lost) return true;
+  return false;
+}
+static bool leakAnyStale() {
+  for (int i = 0; i < LEAK_MAX; i++)
+    if (leaks[i].used && leaks[i].alarm && leaks[i].lost) return true;
   return false;
 }
 
@@ -1529,7 +1536,8 @@ static void leakCheckLost() {
     l.lost = true;
     char lab[32], msg[112];
     leakLabel(l, lab, sizeof(lab));
-    snprintf(msg, sizeof(msg), "Wassersensor meldet sich nicht mehr (seit 15 min): %s", lab);
+    if (l.alarm) snprintf(msg, sizeof(msg), "ACHTUNG: Wassersensor verstummt nach WASSER-Alarm (seit 15 min): %s - bitte vor Ort pruefen", lab);
+    else         snprintf(msg, sizeof(msg), "Wassersensor meldet sich nicht mehr (seit 15 min): %s", lab);
     leakNotify(msg);
   }
 }
@@ -2537,7 +2545,7 @@ static void drawLeakAlarm() {
   u8g2.setFont(u8g2_font_7x14B_tf);
   int y = 42;
   for (int i = 0; i < LEAK_MAX && y < 64; i++) {
-    if (!(leaks[i].used && leaks[i].alarm)) continue;
+    if (!(leaks[i].used && leaks[i].alarm && !leaks[i].lost)) continue;
     char lab[32];
     leakLabel(leaks[i], lab, sizeof(lab));
     lab[18] = 0;                       // 18 Zeichen x 7 px = 126 px
@@ -2914,7 +2922,7 @@ static void handleRoot() {
 #endif
     " &middot; <a class=navlink href='/wasser'>&#128167;&nbsp;Wassersensoren</a>"
     "</p>");
-  if (leakAnyAlarm()) sc(leakBannerHtml());
+  if (leakAnyAlarm() || leakAnyStale()) sc(leakBannerHtml());
   sc("<div class=grid>");
 
   if (n == 0 && sensorCount == 0) {
@@ -4112,15 +4120,30 @@ static void handleDisplayGet() {
  *  Wassersensoren: Banner auf der Startseite und Seite /wasser        *
  * ------------------------------------------------------------------ */
 static String leakBannerHtml() {
-  String b = "<div style='background:#c0392b;color:#fff;padding:1em;border-radius:10px;margin:.8em 0;font-size:1.15em'>"
-             "<b>&#128167; WASSER ERKANNT</b>";
-  for (int i = 0; i < LEAK_MAX; i++) {
-    if (!(leaks[i].used && leaks[i].alarm)) continue;
-    char lab[32];
-    leakLabel(leaks[i], lab, sizeof(lab));
-    b += "<br>" + htmlEscStr(lab) + " &ndash; seit " + String((unsigned long)((millis() - leaks[i].alarmSince) / 60000UL)) + " min";
+  String b;
+  if (leakAnyAlarm()) {
+    b = "<div style='background:#c0392b;color:#fff;padding:1em;border-radius:10px;margin:.8em 0;font-size:1.15em'>"
+        "<b>&#128167; WASSER ERKANNT</b>";
+    for (int i = 0; i < LEAK_MAX; i++) {
+      if (!(leaks[i].used && leaks[i].alarm && !leaks[i].lost)) continue;
+      char lab[32];
+      leakLabel(leaks[i], lab, sizeof(lab));
+      b += "<br>" + htmlEscStr(lab) + " &ndash; seit " + String((unsigned long)((millis() - leaks[i].alarmSince) / 60000UL)) + " min";
+    }
+    b += " &middot; <a style='color:#fff' href='/wasser'>Details</a></div>";
   }
-  b += " &middot; <a style='color:#fff' href='/wasser'>Details</a></div>";
+  if (leakAnyStale()) {
+    b += "<div style='background:#b9791f;color:#fff;padding:1em;border-radius:10px;margin:.8em 0'>"
+         "<b>&#9888; Wassersensor verstummt nach Alarm</b>";
+    for (int i = 0; i < LEAK_MAX; i++) {
+      if (!(leaks[i].used && leaks[i].alarm && leaks[i].lost)) continue;
+      char lab[32];
+      leakLabel(leaks[i], lab, sizeof(lab));
+      b += "<br>" + htmlEscStr(lab) + " &ndash; letzter Stand: Wasser, kein Signal seit " +
+           String((unsigned long)((millis() - leaks[i].stamp) / 60000UL)) + " min &ndash; bitte vor Ort pr&uuml;fen";
+    }
+    b += " &middot; <a style='color:#fff' href='/wasser'>Quittieren</a></div>";
+  }
   return b;
 }
 
@@ -4147,6 +4170,7 @@ static void handleWasserGet() {
     char lab[32];
     leakLabel(l, lab, sizeof(lab));
     String state = !l.seen ? "noch nicht empfangen"
+                 : (l.alarm && l.lost) ? "ALARM-STAND: Sensor verstummt, kein Signal mehr"
                  : l.alarm ? "WASSER ERKANNT"
                  : l.lost  ? "meldet sich nicht mehr"
                            : "trocken";
@@ -4160,8 +4184,10 @@ static void handleWasserGet() {
       if (l.raw >= 0) o += " &middot; Rohwert " + String(l.raw);
     }
     o += "</span><br><label>Name <input type=text name=n" + String(i) + " maxlength=20 value='" +
-         htmlEscStr(l.name) + "' placeholder='z.B. Waschmaschine'></label>"
-         "<br><label><input type=checkbox name=d" + String(i) + "> Eintrag entfernen</label></div>";
+         htmlEscStr(l.name) + "' placeholder='z.B. Waschmaschine'></label>";
+    if (l.alarm && l.lost)
+      o += "<br><label><input type=checkbox name=q" + String(i) + "> Alarmstand quittieren (nach Pr&uuml;fung vor Ort)</label>";
+    o += "<br><label><input type=checkbox name=d" + String(i) + "> Eintrag entfernen</label></div>";
   }
   if (!shown) o += "<p>Noch kein Wassersensor empfangen. Batterie einsetzen &ndash; der Sensor meldet sich nach etwa einer Minute.</p>";
   else o += "<button type=submit>Speichern</button>";
@@ -4181,6 +4207,10 @@ static void handleWasserPost() {
         leakResetSlot(leaks[i]);
         changed = true;
         continue;
+      }
+      if (server.hasArg("q" + String(i)) && leaks[i].alarm && leaks[i].lost) {
+        leaks[i].alarm = false;                    // quittiert: kommt der Sensor mit alarm=1 zurueck, loest er neu aus
+        leaks[i].alarmSince = 0;
       }
       if (server.hasArg("n" + String(i))) {
         String v = server.arg("n" + String(i));
